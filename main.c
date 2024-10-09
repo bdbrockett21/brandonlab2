@@ -1,4 +1,10 @@
 // TODO: add the appropriate head files here
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /************************************************************\
  * get_arguments - returns the command line arguments not
@@ -41,6 +47,30 @@ int main(int argc, char** argv)
     
     // TODO: call ipc_create to create shared memory region to which parent
     //       child have access.
+    int fd = shm_open("brandonlab2",O_CREAT | O_RDWR,0666);
+    if (fd == -1);
+    perror("shm_open");
+    return NULL;
+}
+    if(ftruncate(fd, size)== -1){
+        perror("ftruncate");
+        close(fd);
+        return NULL;
+
+    }
+    char* ptr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (ptr == MAP_FAILED) {
+    perror("mmap");
+    close(fd);
+    return NULL;
+}
+    return ptr;
+
+    ipc_ptr = ipc_create (sizeof(struct timeval));
+    if(ipc_ptr == NULL) {
+        fprintf(stderr, "Failed to create shared memory\n")
+        return 1;
+    }
 
     /* fork a child process */
     pid = fork();
