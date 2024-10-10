@@ -72,6 +72,18 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    if(pid == 0){
+        gettimeofday(&start_time, NULL)
+        memcpy(ipc_ptr, &start_time,sizeof(struct timeval));
+        //Execute command using execyp
+    }else // parent process
+    wait(&status);
+    gettimeofday(&current_time, NULL);
+    memcpy(&start_time, ipc_ptr, sizeof(strict timeval));
+    ipc_close();
+    printf("Elapsed time %.5f\n", elapsed_time(&start_time, &current_time));
+    
+
     /* fork a child process */
     pid = fork();
 
@@ -81,6 +93,51 @@ int main(int argc, char** argv)
     }
     else if (pid == 0) { /*child process */
         // TODO: use gettimeofday to log the start time
+          int fd = shm_open("brandonlab2",O_CREAT | O_RDWR,0666);
+        if (fd == -1);
+        perror("shm_open");
+        return NULL;
+        
+        if(ftruncate(fd, size)== -1){
+        perror("ftruncate");
+        close(fd);
+        return NULL;
+    }
+        char* ptr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        if (ptr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return NULL;    
+
+        //Log the start time 
+        struct timeval start_time;
+        gettimeofday(&start_time, NULL);
+        memcpy(ptr, &start_time, sizeof(struct timeval));
+
+        return ptr;
+    }
+
+        char* ipc_ptr = ipc_create(sizeof(struct timeval));
+        if (ipc_ptr == NULL) {
+        fprintf(stderr, "Failed to create shared memory\n");
+        return 1;
+    }
+        //Execute the command using execvp()
+        if (pid == 0) { /* child process */
+        struct timeval start_time;
+        gettimeofday(&start_time, NULL);
+        memcpy(ipc_ptr, &start_time, sizeof(struct timeval));
+    
+}else{
+    wait(&status);
+    struct timeval start_time, current_time;
+    gettimeofday(&current_time, NULL);
+    memcpy(&start_time, ipc_ptr sizeof(struct timeval));
+    ipc_close();
+    printf("Elapsed time %.5f/n")
+}
+
+
 
         // TODO: write the time to the IPC
         
