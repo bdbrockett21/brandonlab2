@@ -5,6 +5,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+
+#define SHM_KEY 0x1234
+#define SHM_SIZE sizeof(struct timeval)
 
 /************************************************************\
  * get_arguments - returns the command line arguments not
@@ -47,25 +51,32 @@ int main(int argc, char** argv)
     
     // TODO: call ipc_create to create shared memory region to which parent
     //       child have access.
-    int fd = shm_open("brandonlab2",O_CREAT | O_RDWR,0666);
-    if (fd == -1);
-    perror("shm_open");
-    return NULL;
+        ipc_ptr = ipc_create(sizeof(start_time));
+    }
+    struct timeval *shm_ptr = (struct timeval *) shmat(shimd, NULL , 0);
+    if (shm_ptr == (struct timeval *)-1);
+        perror("shmat");
+        exit(1);
 }
-    if(ftruncate(fd, size)== -1){
-        perror("ftruncate");
-        close(fd);
-        return NULL;
+    if (shmdt(shm_ptr)== -1) {
+        perror("shmdt");
+        exit(1);
 
     }
-    char* ptr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (ptr == MAP_FAILED) {
-    perror("mmap");
-    close(fd);
-    return NULL;
-}
-    return ptr;
 
+    if(shmctl(shmid, IPC_RMID, NULL)== -1) {
+        perror("shmctl")
+        exit(1);
+    }
+
+    strut timeval *shm_ptr = (struct timeval *)shmat(shmid, NULL, 0);
+    if (shm_ptr == (struct timeval *)-1) {
+    perror("shmat");
+    exit(1);
+}
+
+    gettimeofday(shm_ptr, NULL);
+    
     ipc_ptr = ipc_create (sizeof(struct timeval));
     if(ipc_ptr == NULL) {
         fprintf(stderr, "Failed to create shared memory\n")
@@ -93,22 +104,35 @@ int main(int argc, char** argv)
     }
     else if (pid == 0) { /*child process */
         // TODO: use gettimeofday to log the start time
-          int fd = shm_open("brandonlab2",O_CREAT | O_RDWR,0666);
-        if (fd == -1);
-        perror("shm_open");
-        return NULL;
-        
-        if(ftruncate(fd, size)== -1){
-        perror("ftruncate");
-        close(fd);
-        return NULL;
-    }
-        char* ptr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        if (ptr == MAP_FAILED) {
-        perror("mmap");
-        close(fd);
-        return NULL;    
+        char ** get arguments(int argc, char** argv){
+            int arg_length = argc;
+            char ** cmd_args = NULL;
+            if(arg_length > 0) {
+                cmd_args = (char**)malloc(sizeof(char*)*arg_length);
+            }
+            for (int i = 0; i < arg_length - 1; i++) {
+                cmd_args[i] = argv[i + 1];
+            }
+            cmd_args[arg_length - 1] = NULL;
+            return cmd_args
+        }
 
+        int main(int argc, char** argv){
+            pid_t pid;
+            int status;
+            char* command = NULL;
+            char* command_args = NULL;
+            struct timeval start_time;
+            struct timeval current_time;
+        }
+
+        if (argc < 2) {
+            fprintf(stderr, "SYNOPSIS: %s ,<cmd> <cmd arguments>\n",argv);
+            return 1;
+        }
+
+
+        
         //Log the start time 
         struct timeval start_time;
         gettimeofday(&start_time, NULL);
@@ -140,20 +164,46 @@ int main(int argc, char** argv)
 
 
         // TODO: write the time to the IPC
+          int fd = shm_open("brandonlab2",O_CREAT | O_RDWR,0666);
+        if (fd == -1);
+        perror("shm_open");
+        return NULL;
+        
+        if(ftruncate(fd, size)== -1){
+        perror("ftruncate");
+        close(fd);
+        return NULL;
+    }
+        char* ptr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        if (ptr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return NULL;    
+
+
         
         // TODO: get the list of arguments to be used in execvp() and 
         // execute execvp()
+        int main() {
+            // Define the command line and arguments 
+            char *args[] = {"ls","-l",NULL};
+            // Execute the command 
+            execvp(args[0],args)
+            // if execvp returns then that means it failed 
+            perror("execvp failed");
+        }
 
     }
     else { /* parent process */
         // TODO: have parent wait and get status of child.
         //       Use the variable status to store status of child. 
-        
+            pid =  wait(NULL);
         // TODO: get the current time using gettimeofday
-        
+        gettimeofday(&current_time,NULL);
         // TODO: read the start time from IPC
-        
+        memcpy(&start_time,ipc_ptr,sizeof(ipc_ptr));
         // TODO: close IPC
+        ipc_close;
 
         // NOTE: DO NOT ALTER THE LINE BELOW.
         printf("Elapsed time %.5f\n",elapsed_time(&start_time, &current_time));
