@@ -1,12 +1,12 @@
 // TODO: add the appropriate header files here
-#include <stdio.h>
-#include <stdlib.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <stdio.h> 
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/time.h>
-#include <unistd.h>
-
-
+#include <sys/stat.h>
+#include <stdlib.h>
 /**************************************************************
  *  ipc_create - creates a shared memory object called lab2 and
  *               returns a char pointer to the memory shared
@@ -20,37 +20,19 @@ char* ipc_create(int size){
     int fd;
     /* pointer to shared memory obect */
     char* ptr;
+    /* Name of the shared memory*/
+    const char *name = "lab2";
 
     // TODO: create the shared memory object called lab2
-    fd = shm_open("lab2",O_CREAT | O_RDWR, 0666);
-    if(fd == -1) {
-        perror("shm_open failed");
-        exit(1);
-    }
-    }
-    // configure the size of the shared memory object
-    if(ftruncate(fd, size)== -1){
-        perror("ftruncate failed");
-        exit(1);
-    }
-    // Memory map of the shared memory object 
-    ptr = (char*)mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (ptr == MAP_FAILED) {
-        perror("mmap failed");
-        exit(1);
-    }
+    fd = shm_open(name, O_CREAT | O_RDWR, 0666);
 
     // TODO: configure the size of the shared memory object 
-    if(ftruncate(fd, size)== -1)
-        perror("ftruncate failed");
-        exit(1);
+    ftruncate(fd, size);
 
     // TODO: memory map the shared memory object */
-    ptr = (char*)mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (ptr == MAP_FAILED) {
-        perror("mmap failed");
-        exit(1);
-
+    ptr = (char*)
+    mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0); 
+    
     return ptr;
 }
 
