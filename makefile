@@ -1,5 +1,5 @@
 time: main.o ipc.o time.o
-	gcc -o time time.o main.o ipc.o -lrt
+	gcc -o time time.o main.o ipc.o 
 
 main.o: main.c
 	gcc -c main.c
