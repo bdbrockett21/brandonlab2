@@ -6,7 +6,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <stdlib.h>
+
+
 /**************************************************************
  *  ipc_create - creates a shared memory object called lab2 and
  *               returns a char pointer to the memory shared
@@ -31,8 +32,8 @@ char* ipc_create(int size){
 
     // TODO: memory map the shared memory object */
     ptr = (char*)
-    mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0); 
-    
+    mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
     return ptr;
 }
 
